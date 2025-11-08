@@ -1,0 +1,27 @@
+.container {
+  padding: 20px;
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.form-card {
+  flex: 1; /* Ocupa 1 parte */
+}
+
+.table-card {
+  flex: 2; /* Ocupa 2 partes */
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+table {
+  width: 100%;
+}

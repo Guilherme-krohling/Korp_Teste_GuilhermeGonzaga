@@ -1,0 +1,28 @@
+# ===================================================================
+# Visual Studio / .NET (Para a pasta Backend/)
+# ===================================================================
+**/[Bb]in/
+**/[Oo]bj/
+**/.vs/
+*.suo
+*.user
+
+# Ignorar arquivos de configurações locais (que podem conter segredos)
+# O appsettings.json DEVE ir para o Git, mas o Development NÃO.
+**/appsettings.Development.json
+
+# ===================================================================
+# Node.js / Angular (Para a pasta Frontend/)
+# ===================================================================
+**/node_modules/
+**/dist/
+**/.angular/cache/
+*.log
+npm-debug.log*
+.env
+
+# ===================================================================
+# Arquivos de Sistema Operacional e IDEs
+# ===================================================================
+.DS_Store
+Thumbs.db

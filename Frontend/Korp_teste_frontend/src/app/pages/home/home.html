@@ -1,0 +1,57 @@
+<div class="container">
+  <mat-card class="form-card">
+    <mat-card-title>Cadastrar Novo Produto</mat-card-title>
+    <mat-card-content>
+      <form (ngSubmit)="cadastrarProduto()" #produtoForm="ngForm" class="form-container">
+
+        <mat-form-field appearance="fill">
+          <mat-label>Código</mat-label>
+          <input matInput [(ngModel)]="novoProduto.codigo" name="codigo" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Descrição (Nome)</mat-label>
+          <input matInput [(ngModel)]="novoProduto.descricao" name="descricao" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Saldo (Quantidade)</mat-label>
+          <input matInput type="number" [(ngModel)]="novoProduto.saldo" name="saldo" required min="0">
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" type="submit" [disabled]="!produtoForm.form.valid">
+          Salvar Produto
+        </button>
+
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="table-card">
+    <mat-card-title>Produtos em Estoque</mat-card-title>
+    <mat-card-content>
+
+      <table mat-table [dataSource]="produtos" class="mat-elevation-z8">
+
+        <ng-container matColumnDef="codigo">
+          <th mat-header-cell *matHeaderCellDef> Código </th>
+          <td mat-cell *matCellDef="let p"> {{p.codigo}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="descricao">
+          <th mat-header-cell *matHeaderCellDef> Descrição </th>
+          <td mat-cell *matCellDef="let p"> {{p.descricao}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="saldo">
+          <th mat-header-cell *matHeaderCellDef> Saldo </th>
+          <td mat-cell *matCellDef="let p"> {{p.saldo}} </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+
+    </mat-card-content>
+  </mat-card>
+</div>
