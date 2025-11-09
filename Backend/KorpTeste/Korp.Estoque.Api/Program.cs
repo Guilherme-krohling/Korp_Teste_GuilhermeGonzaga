@@ -47,7 +47,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 // ==========================================================
 // <<< ADICIONAR: 3. Diga ao app para USAR a política de CORS

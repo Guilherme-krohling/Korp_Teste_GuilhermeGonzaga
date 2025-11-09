@@ -1,6 +1,24 @@
-<!-- <app-home></app-home> -->]
- <mat-toolbar color="primary">
+<mat-toolbar color="primary">
   <span>Korp - Teste Prático</span>
+
+  <nav mat-tab-nav-bar [tabPanel]="tabPanel">
+    <a mat-tab-link 
+       routerLink="/" 
+       routerLinkActive="mat-tab-link-active"
+       #rlaProdutos="routerLinkActive"
+       [active]="rlaProdutos.isActive">
+       Estoque (Produtos)
+    </a>
+    <a mat-tab-link 
+       routerLink="/faturamento" 
+       routerLinkActive="mat-tab-link-active"
+       #rlaFaturamento="routerLinkActive"
+       [active]="rlaFaturamento.isActive">
+       Faturamento (Notas)
+    </a>
+  </nav>
+  <mat-tab-nav-panel #tabPanel></mat-tab-nav-panel>
+
 </mat-toolbar>
 
 <router-outlet></router-outlet>

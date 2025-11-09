@@ -86,6 +86,47 @@ namespace Korp.Estoque.Api.Controllers
         }
 
         // ==========================================================
+        // ENDPOINT 3: PUT /api/produtos/abater-saldo (Para o Faturamento)
+        // ==========================================================
+        public class AbaterSaldoModel
+        {
+            public string CodigoProduto { get; set; } = string.Empty;
+            public int Quantidade { get; set; }
+        }
+
+        [HttpPut("abater-saldo")]
+        public async Task<IActionResult> AbaterSaldo([FromBody] AbaterSaldoModel model)
+        {
+            try
+            {
+                var produto = await _context.Produtos
+                                        .FirstOrDefaultAsync(p => p.Codigo == model.CodigoProduto);
+
+                if (produto == null)
+                {
+                    return NotFound(new { message = "Produto não encontrado." });
+                }
+
+                if (produto.Saldo < model.Quantidade)
+                {
+                    // Erro de regra de negócio
+                    return BadRequest(new { message = "Saldo insuficiente em estoque." });
+                }
+
+                // A lógica principal
+                produto.Saldo -= model.Quantidade;
+                await _context.SaveChangesAsync();
+
+                return Ok(new { message = "Saldo abatido com sucesso.", novoSaldo = produto.Saldo });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro ao abater saldo do produto.");
+                return StatusCode(500, "Erro interno ao atualizar saldo.");
+            }
+        }
+
+        // ==========================================================
         // ENDPOINT AUXILIAR: GET /api/produtos/{id} (Usado pelo PostProduto)
         // ==========================================================
         [HttpGet("{id}")]

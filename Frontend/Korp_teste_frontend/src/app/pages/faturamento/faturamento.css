@@ -1,0 +1,67 @@
+.container {
+  padding: 20px;
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.form-card {
+  flex: 1; /* Ocupa 1 parte */
+}
+
+.table-card {
+  flex: 2; /* Ocupa 2 partes */
+}
+
+.form-novo-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.input-quantidade {
+  width: 80px;
+}
+
+.lista-itens-nova-nota {
+  min-height: 100px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
+.lista-vazia {
+  color: #999;
+  font-style: italic;
+}
+
+.item-nota {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+  border-bottom: 1px solid #eee;
+}
+
+table {
+  width: 100%;
+}
+
+/* Classes de Status */
+.status-aberta {
+  color: #c29100; /* Amarelo/Laranja */
+  font-weight: 500;
+}
+
+.status-fechada {
+  color: #007c1b; /* Verde */
+  font-weight: 500;
+}
+
+/* Centraliza o spinner */
+mat-spinner {
+  margin: 0 auto;
+}
