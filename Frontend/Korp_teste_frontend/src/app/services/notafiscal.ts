@@ -58,4 +58,19 @@ export class NotafiscalService {
     // Note a URL: .../api/notasfiscais/1/imprimir
     return this.http.put<NotaFiscal>(`${this.apiUrl}/${id}/imprimir`, {});
   }
+
+  // GET (por ID): Busca uma única nota fiscal
+  getNotaFiscalPorId(id: number): Observable<NotaFiscal> {
+    return this.http.get<NotaFiscal>(`${this.apiUrl}/${id}`);
+  }
+
+  // DELETE: Exclui uma nota fiscal
+  deleteNotaFiscal(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
+  // PUT: Atualiza uma nota fiscal existente
+  updateNotaFiscal(id: number, notaInput: NotaFiscalInput): Observable<NotaFiscal> {
+  return this.http.put<NotaFiscal>(`${this.apiUrl}/${id}`, notaInput);
+  }
 }

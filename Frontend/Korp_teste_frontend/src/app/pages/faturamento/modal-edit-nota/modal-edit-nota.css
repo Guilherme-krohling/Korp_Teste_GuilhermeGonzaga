@@ -1,28 +1,8 @@
-.container {
-  max-width: 1200px;
-  margin: 20px auto;
-  padding: 0 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.form-card {
-  width: 100%;
-}
-
-.table-card {
-  width: 100%;
-}
-
+/* Copiado de 'faturamento.css' */
 .form-novo-item {
   display: flex;
   align-items: center;
   gap: 10px;
-}
-
-.form-novo-item mat-form-field:first-child {
-  flex: 1;
 }
 
 .input-quantidade {
@@ -36,6 +16,7 @@
   padding: 10px;
   background-color: #f9f9f9;
   border-radius: 4px;
+  margin-top: 16px;
   margin-bottom: 16px;
 }
 
@@ -52,26 +33,27 @@
   border-bottom: 1px solid #eee;
 }
 
-table {
-  width: 100%;
-}
-
-.status-aberta {
-  color: #c29100;
-  font-weight: 500;
-}
-
-.status-fechada {
-  color: #007c1b;
-  font-weight: 500;
-}
-
-mat-spinner {
-  margin: 0 auto;
-}
-
-.coluna-acoes {
+/* Específico do Modal */
+.spinner-container {
   display: flex;
-  gap: 4px;
+  justify-content: center;
   align-items: center;
+  min-height: 200px;
+}
+
+.salvar-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.salvar-wrapper mat-spinner {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.salvar-wrapper button[disabled] {
+  color: rgba(0, 0, 0, 0.38);
 }

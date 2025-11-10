@@ -165,6 +165,98 @@ namespace Korp.Faturamento.Api.Controllers
                 return StatusCode(500, "Erro interno ao comunicar com o serviço de estoque.");
             }
         }
+        // ==========================================================
+        // ENDPOINT 4: DELETE /api/notasfiscais/{id} (Excluir Nota)
+        // ==========================================================
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteNotaFiscal(int id)
+        {
+            try
+            {
+                var notaFiscal = await _context.NotasFiscais
+                                             .Include(n => n.Itens) // Puxa os itens
+                                             .FirstOrDefaultAsync(n => n.Id == id);
+
+                if (notaFiscal == null)
+                {
+                    return NotFound(new { message = "Nota Fiscal não encontrada." });
+                }
+
+                // Regra de Negócio: Não podemos excluir uma nota que já foi fechada
+                if (notaFiscal.Status == NotaFiscalStatus.Fechada)
+                {
+                    return BadRequest(new
+                    {
+                        message = "Não é possível excluir uma nota fiscal que já foi fechada."
+                    });
+                }
+
+                // O EF Core é inteligente: ao remover a nota,
+                // ele também remove os Itens associados a ela (em cascata).
+                _context.NotasFiscais.Remove(notaFiscal);
+                await _context.SaveChangesAsync();
+
+                return NoContent(); // Sucesso
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro inesperado ao excluir nota fiscal.");
+                return StatusCode(500, "Erro interno do servidor.");
+            }
+        }
+
+        // ==========================================================
+        // ENDPOINT 5: PUT /api/notasfiscais/{id} (Editar Nota Aberta)
+        // ==========================================================
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutNotaFiscal(int id, NotaFiscalInputModel input)
+        {
+            if (input.Itens == null || !input.Itens.Any())
+            {
+                return BadRequest(new { message = "A nota fiscal deve ter pelo menos um item." });
+            }
+
+            try
+            {
+                // 1. Encontra a nota e seus itens atuais
+                var notaFiscal = await _context.NotasFiscais
+                                             .Include(n => n.Itens)
+                                             .FirstOrDefaultAsync(n => n.Id == id);
+
+                if (notaFiscal == null)
+                {
+                    return NotFound(new { message = "Nota Fiscal não encontrada." });
+                }
+
+                // 2. Regra de Negócio: Só pode editar notas ABERTAS
+                if (notaFiscal.Status == NotaFiscalStatus.Fechada)
+                {
+                    return BadRequest(new { message = "Não é possível editar uma nota que já foi fechada." });
+                }
+
+                // 3. Lógica de Atualização:
+                // Remove os itens antigos...
+                _context.ItensNotaFiscal.RemoveRange(notaFiscal.Itens);
+
+                // Adiciona os novos itens
+                notaFiscal.Itens = input.Itens.Select(itemInput => new ItemNotaFiscal
+                {
+                    CodigoProduto = itemInput.CodigoProduto,
+                    Quantidade = itemInput.Quantidade
+                }).ToList();
+
+                // Salva as mudanças
+                await _context.SaveChangesAsync();
+
+                return Ok(notaFiscal); // Retorna a nota atualizada
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro inesperado ao editar nota fiscal.");
+                return StatusCode(500, "Erro interno do servidor.");
+            }
+        }
+
 
         // Endpoint auxiliar para o CreatedAtAction
         [HttpGet("{id}")]
@@ -180,5 +272,6 @@ namespace Korp.Faturamento.Api.Controllers
             }
             return Ok(nota);
         }
+
     }
 }

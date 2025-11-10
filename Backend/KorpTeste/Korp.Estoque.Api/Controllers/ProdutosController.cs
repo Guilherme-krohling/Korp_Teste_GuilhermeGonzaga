@@ -150,5 +150,91 @@ namespace Korp.Estoque.Api.Controllers
                 return StatusCode(500, "Erro interno do servidor.");
             }
         }
+        // ==========================================================
+        // ENDPOINT 4: PUT /api/produtos/{id} (Editar Produto)
+        // ==========================================================
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutProduto(int id, Produto produto)
+        {
+            // Valida se o ID da URL é o mesmo do objeto enviado
+            if (id != produto.Id)
+            {
+                return BadRequest(new { message = "O ID do produto na URL não corresponde ao ID no corpo da requisição." });
+            }
+
+            // Validação dos campos
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                // Verifica se o código que está sendo enviado já pertence a OUTRO produto
+                bool codigoJaExiste = await _context.Produtos
+                                                .AnyAsync(p => p.Codigo == produto.Codigo && p.Id != id);
+
+                if (codigoJaExiste)
+                {
+                    return Conflict(new { message = "Já existe outro produto com este código." });
+                }
+
+                // Informa ao EF Core que este objeto deve ser "atualizado"
+                _context.Entry(produto).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+
+                return NoContent(); // Retorno padrão para PUT (Sucesso, sem conteúdo)
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                // Esta exceção acontece se tentamos editar um produto que
+                // foi deletado por outra pessoa.
+                if (!_context.Produtos.Any(p => p.Id == id))
+                {
+                    return NotFound(new { message = "Produto não encontrado." });
+                }
+                else
+                {
+                    throw; // Lança a exceção para o log
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro inesperado ao editar produto.");
+                return StatusCode(500, "Erro interno do servidor.");
+            }
+        }
+
+        // ==========================================================
+        // ENDPOINT 5: DELETE /api/produtos/{id} (Excluir Produto)
+        // ==========================================================
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteProduto(int id)
+        {
+            try
+            {
+                var produto = await _context.Produtos.FindAsync(id);
+                if (produto == null)
+                {
+                    return NotFound(new { message = "Produto não encontrado." });
+                }
+
+                // Aqui, precisaríamos verificar se o produto está sendo
+                // usado em alguma nota fiscal.
+                // (Vamos adicionar essa lógica depois, por enquanto é uma exclusão simples)
+
+                _context.Produtos.Remove(produto);
+                await _context.SaveChangesAsync();
+
+                return NoContent(); // Retorno padrão para DELETE (Sucesso, sem conteúdo)
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro inesperado ao excluir produto.");
+                return StatusCode(500, "Erro interno do servidor.");
+            }
+        }
+
+
     }
 }

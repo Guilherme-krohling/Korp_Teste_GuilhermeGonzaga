@@ -3,11 +3,12 @@
 
   <nav mat-tab-nav-bar [tabPanel]="tabPanel">
     <a mat-tab-link 
-       routerLink="/" 
-       routerLinkActive="mat-tab-link-active"
-       #rlaProdutos="routerLinkActive"
-       [active]="rlaProdutos.isActive">
-       Estoque (Produtos)
+      routerLink="/" 
+      routerLinkActive="mat-tab-link-active"
+      [routerLinkActiveOptions]="{exact: true}"
+      #rlaProdutos="routerLinkActive"
+      [active]="rlaProdutos.isActive">
+      Estoque (Produtos)
     </a>
     <a mat-tab-link 
        routerLink="/faturamento" 

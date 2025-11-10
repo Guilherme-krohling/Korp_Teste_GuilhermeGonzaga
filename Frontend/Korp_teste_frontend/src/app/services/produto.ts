@@ -4,7 +4,7 @@ import { Observable } from 'rxjs'; // Importação principal do RxJS
 
 // Criamos uma interface para o nosso modelo 'Produto'
 export interface Produto {
-  id?: number; // '?' significa que é opcional (não temos ao criar)
+  id?: number;
   codigo: string;
   descricao: string;
   saldo: number;
@@ -28,4 +28,17 @@ export class ProdutoService {
   addProduto(produto: Produto): Observable<Produto> {
     return this.http.post<Produto>(this.apiUrl, produto);
   }
+
+  // PUT: Atualiza um produto existente
+  updateProduto(produto: Produto): Observable<void> {
+    // Note a URL: .../api/produtos/5 (usando o ID do produto)
+    return this.http.put<void>(`${this.apiUrl}/${produto.id}`, produto);
+  }
+
+  // DELETE: Exclui um produto
+  deleteProduto(id: number): Observable<void> {
+    // Note a URL: .../api/produtos/5
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
 }

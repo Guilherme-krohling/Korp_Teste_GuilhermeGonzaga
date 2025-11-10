@@ -7,20 +7,22 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule } from '@angular/material/table';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatCardModule } from '@angular/material/card';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatCardModule, MatCardHeader} from '@angular/material/card';
+
+import { MatSnackBar} from '@angular/material/snack-bar';
+import { MatIconModule } from '@angular/material/icon'; 
 
 // Nosso serviço e modelo
-import { ProdutoService, Produto } from '../../services/produto'; // Verifique se o nome é 'produto.ts' ou 'produto.service.ts'
+import { ProdutoService, Produto } from '../../services/produto';
 import { HttpErrorResponse } from '@angular/common/http';
 import { catchError, throwError } from 'rxjs';
 
 @Component({
   selector: 'app-home',
-  standalone: true, // Garante que é standalone
+  standalone: true,
   templateUrl: './home.html',
   styleUrls: ['./home.css'],
-  imports: [ // Garante que 'imports' é a palavra correta
+  imports: [ 
     CommonModule,
     FormsModule,
     MatInputModule,
@@ -28,21 +30,27 @@ import { catchError, throwError } from 'rxjs';
     MatTableModule,
     MatFormFieldModule,
     MatCardModule,
-    MatSnackBarModule 
+    MatCardHeader,
+    MatIconModule
   ]
 })
 export class Home implements OnInit {
   
-  // Injeção de dependência moderna
   private produtoService = inject(ProdutoService);
   private snackBar = inject(MatSnackBar);
 
   @ViewChild('produtoForm') produtoForm!: NgForm;
 
-  produtos: Produto[] = [];
-  displayedColumns: string[] = ['codigo', 'descricao', 'saldo'];
+  // --- LÓGICA DE EDIÇÃO ---
+  produtoSelecionado: Produto | null = null; 
+  tituloFormulario: string = 'Cadastrar Novo Produto';
+  // --- FIM LÓGICA DE EDIÇÃO ---
 
-  novoProduto: Produto = {
+  produtos: Produto[] = [];
+  displayedColumns: string[] = ['codigo', 'descricao', 'saldo', 'acoes']; 
+
+  formProduto: Produto = {
+    id: 0,
     codigo: '',
     descricao: '',
     saldo: 0
@@ -58,28 +66,72 @@ export class Home implements OnInit {
     });
   }
 
-  cadastrarProduto(): void {
-    this.produtoService.addProduto(this.novoProduto)
-      .pipe(
-        catchError((erro: HttpErrorResponse) => {
-          if (erro.status === 409) {
-            this.mostrarNotificacao('Erro: Já existe um produto com este código.', true);
-          } else {
-            this.mostrarNotificacao('Erro ao cadastrar produto.', true);
-          }
-          return throwError(() => new Error('Erro no cadastro'));
-        })
-      )
-      .subscribe((produtoCriado) => {
-        this.mostrarNotificacao(`Produto "${produtoCriado.descricao}" cadastrado!`);
-        this.carregarProdutos();
-        this.limparFormulario();
-      });
+  // --- NOVA LÓGICA DE SALVAR ---
+  salvarProduto(): void {
+    if (this.produtoSelecionado) {
+      // Modo Edição (PUT)
+      this.produtoService.updateProduto(this.formProduto)
+        .pipe(catchError((err) => this.handleError(err, 'editar')))
+        .subscribe(() => {
+          this.mostrarNotificacao('Produto atualizado com sucesso!');
+          this.cancelarEdicao();
+          this.carregarProdutos();
+        });
+    } else {
+      // Modo Cadastro (POST)
+      const { id, ...novoProduto } = this.formProduto; 
+
+      this.produtoService.addProduto(novoProduto as Produto)
+        .pipe(catchError((err) => this.handleError(err, 'cadastrar')))
+        .subscribe((produtoCriado) => {
+          this.mostrarNotificacao(`Produto "${produtoCriado.descricao}" cadastrado!`);
+          this.limparFormulario();
+          this.carregarProdutos();
+        });
+    }
+  }
+
+  // --- NOVA LÓGICA DE EDIÇÃO ---
+  selecionarParaEditar(produto: Produto): void {
+    this.produtoSelecionado = { ...produto }; 
+    this.formProduto = { ...produto };
+    this.tituloFormulario = `Editando Produto: ${produto.descricao}`;
+  }
+
+  cancelarEdicao(): void {
+    this.produtoSelecionado = null;
+    this.tituloFormulario = 'Cadastrar Novo Produto';
+    this.limparFormulario();
+  }
+  
+  // --- NOVA LÓGICA DE EXCLUSÃO ---
+  excluirProduto(produto: Produto): void {
+    if (confirm(`Tem certeza que deseja excluir o produto "${produto.descricao}"?`)) {
+      this.produtoService.deleteProduto(produto.id!)
+        .pipe(catchError((err) => this.handleError(err, 'excluir')))
+        .subscribe(() => {
+          this.mostrarNotificacao('Produto excluído com sucesso!');
+          this.carregarProdutos();
+        });
+    }
   }
 
   limparFormulario(): void {
     this.produtoForm.resetForm();
-    this.novoProduto = { codigo: '', descricao: '', saldo: 0 };
+    this.formProduto = { id: 0, codigo: '', descricao: '', saldo: 0 };
+  }
+
+  // --- NOVA FUNÇÃO DE ERRO ---
+  private handleError(erro: HttpErrorResponse, acao: string) {
+    let msg = `Erro ao ${acao} produto.`;
+    if (erro.status === 409) {
+      msg = 'Erro: Já existe outro produto com este código.';
+    } else if (erro.status === 404) {
+      msg = 'Erro: Produto não encontrado.';
+    }
+    
+    this.mostrarNotificacao(msg, true);
+    return throwError(() => new Error(erro.message));
   }
 
   mostrarNotificacao(mensagem: string, erro: boolean = false): void {

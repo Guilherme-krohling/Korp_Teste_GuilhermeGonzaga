@@ -8,7 +8,7 @@ import { provideClientHydration } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideHttpClient, withFetch } from '@angular/common/http';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-
+import { MatDialogModule } from '@angular/material/dialog';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -18,6 +18,7 @@ export const appConfig: ApplicationConfig = {
     
     provideAnimations(), // Para o Material Animations
     provideHttpClient(withFetch()), // Para o HttpClient
-    importProvidersFrom(MatSnackBarModule) // Para o MatSnackBar
+    importProvidersFrom(MatSnackBarModule), // Para o MatSnackBar
+    importProvidersFrom(MatDialogModule)
   ]
 };

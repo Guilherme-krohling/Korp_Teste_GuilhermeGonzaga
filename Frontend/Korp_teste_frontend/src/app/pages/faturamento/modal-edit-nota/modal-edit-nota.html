@@ -1,0 +1,58 @@
+<h1 mat-dialog-title>
+  Editar Nota Fiscal 
+  <span *ngIf="notaCarregada">#{{notaCarregada.numeroSequencial}}</span>
+</h1>
+
+<div *ngIf="isLoading" class="spinner-container">
+  <mat-spinner></mat-spinner>
+</div>
+
+<div mat-dialog-content *ngIf="!isLoading">
+
+  <div class="form-novo-item">
+    <mat-form-field appearance="fill">
+      <mat-label>Selecione um Produto</mat-label>
+      <mat-select [(ngModel)]="novoItem.codigoProduto" name="codigoProduto">
+        <mat-option *ngFor="let produto of data.listaProdutos" [value]="produto.codigo">
+          {{produto.codigo}} - {{produto.descricao}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="input-quantidade">
+      <mat-label>Qtd.</mat-label>
+      <input matInput type="number" [(ngModel)]="novoItem.quantidade" name="quantidade" min="1">
+    </mat-form-field>
+
+    <button mat-mini-fab color="primary" (click)="adicionarItem()" 
+            [disabled]="!novoItem.codigoProduto || novoItem.quantidade <= 0">
+      <mat-icon>add</mat-icon>
+    </button>
+  </div>
+
+  <div class="lista-itens-nova-nota">
+    <div *ngIf="itensParaSalvar.length === 0" class="lista-vazia">
+      Adicione itens à nota...
+    </div>
+    <div *ngFor="let item of itensParaSalvar; let i = index" class="item-nota">
+      <span>{{item.quantidade}}x {{item.codigoProduto}}</span>
+      <button mat-icon-button color="warn" (click)="removerItem(i)">
+        <mat-icon>delete_outline</mat-icon>
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<div mat-dialog-actions align="end">
+  <div class="salvar-wrapper">
+    <button mat-raised-button color="primary" 
+            (click)="salvarEdicao()" 
+            [disabled]="isLoading || isSaving || itensParaSalvar.length === 0">
+      Salvar
+    </button>
+    <mat-spinner *ngIf="isSaving" [diameter]="24"></mat-spinner>
+  </div>
+
+  <button mat-button (click)="fecharModal()" [disabled]="isSaving">Cancelar</button>
+</div>

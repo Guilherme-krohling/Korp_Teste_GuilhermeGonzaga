@@ -1,4 +1,53 @@
-/* You can add global styles to this file, and also import other style files */
-
+/* Configuração padrão */
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.mat-mdc-raised-button.btn-success {
+  background-color: #28a745; 
+  color: #ffffff;
+}
+
+.mat-mdc-raised-button.btn-success[disabled] {
+  background-color: rgba(40, 167, 69, 0.4);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* --- Correção da "Linha Torta" (Alinhamento) --- */
+.mat-mdc-table .mat-mdc-cell {
+  vertical-align: middle;
+}
+
+.mat-mdc-table .mat-mdc-header-cell {
+  vertical-align: middle;
+}
+
+/*COISA NOVA AQUI PRA BAIXO*/
+
+/* --- Classe para Botão Verde (Salvar) --- */
+.mat-mdc-raised-button.btn-success {
+  background-color: #28a745; 
+  color: #ffffff;
+}
+.mat-mdc-raised-button.btn-success[disabled] {
+  background-color: rgba(40, 167, 69, 0.4);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* --- Novas classes para os botões de Ação --- */
+/* Para o botão EDITAR (Amarelo) */
+.btn-edit {
+  color: #ffc107; /* Amarelo/Âmbar */
+}
+
+/* Para o botão EXCLUIR (Vermelho) */
+.btn-delete {
+  color: #f44336; /* Vermelho */
+}
+
+/* --- Correção da "Linha Torta" (Alinhamento) --- */
+.mat-mdc-table .mat-mdc-cell {
+  vertical-align: middle;
+}
+.mat-mdc-table .mat-mdc-header-cell {
+  vertical-align: middle;
+}

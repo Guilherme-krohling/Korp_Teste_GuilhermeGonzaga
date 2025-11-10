@@ -1,16 +1,19 @@
 .container {
-  padding: 20px;
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 0 20px;
+
   display: flex;
+  flex-direction: column;
   gap: 20px;
-  align-items: flex-start;
 }
 
 .form-card {
-  flex: 1; /* Ocupa 1 parte */
+  width: 100%;
 }
 
 .table-card {
-  flex: 2; /* Ocupa 2 partes */
+  width: 100%;
 }
 
 .form-container {
@@ -24,4 +27,16 @@ mat-form-field {
 
 table {
   width: 100%;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.coluna-acoes {
+  display: flex;
+  gap: 4px;
+  align-items: center;
 }
