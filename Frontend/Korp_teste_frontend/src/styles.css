@@ -51,3 +51,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 .mat-mdc-table .mat-mdc-header-cell {
   vertical-align: middle;
 }
+
+.mat-mdc-form-field.mat-mdc-form-field-invalid .mat-mdc-form-field-error {
+  color: #f44336; /* Vermelho (mesma cor do .btn-delete) */
+}

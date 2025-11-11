@@ -45,7 +45,11 @@ export class ModalEditNota implements OnInit {
   public dialogRef = inject(MatDialogRef<ModalEditNota>);
   
   // Recebendo os dados (ID da nota e lista de produtos) da página principal
-  public data: { notaId: number, listaProdutos: Produto[] } = inject(MAT_DIALOG_DATA);
+  public data: { 
+    notaId: number, 
+    listaProdutos: Produto[], 
+    isReadOnly?: boolean // <-- ADICIONE ESTA LINHA
+  } = inject(MAT_DIALOG_DATA);
 
   // Variáveis locais
   public notaCarregada: NotaFiscal | null = null;
@@ -53,8 +57,10 @@ export class ModalEditNota implements OnInit {
   public novoItem: ItemNotaFiscalInput = { codigoProduto: '', quantidade: 1 };
   public isLoading = true; // Controla o spinner de "carregando nota"
   public isSaving = false; // Controla o spinner de "salvando"
+  public isReadOnly = false;
 
   ngOnInit(): void {
+    this.isReadOnly = this.data.isReadOnly ?? false;
     // Busca os dados da nota fiscal assim que o modal abre
     this.notafiscalService.getNotaFiscalPorId(this.data.notaId).subscribe(nota => {
       this.notaCarregada = nota;
@@ -66,7 +72,14 @@ export class ModalEditNota implements OnInit {
       this.isLoading = false;
     });
   }
-
+  getDescricaoProduto(codigo: string): string {
+      // 1. Procura o produto na lista que recebemos da página principal
+      const produto = this.data.listaProdutos.find(p => p.codigo === codigo);
+      
+      // 2. Se encontrar, retorna a descrição. Se não, retorna um texto padrão.
+      return produto ? produto.descricao : 'Produto não encontrado';
+  }
+  
   // --- Funções do Formulário ---
   adicionarItem(): void {
     if (this.novoItem.codigoProduto && this.novoItem.quantidade > 0) {

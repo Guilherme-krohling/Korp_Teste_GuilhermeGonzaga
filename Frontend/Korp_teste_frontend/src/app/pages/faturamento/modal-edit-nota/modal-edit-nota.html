@@ -1,6 +1,10 @@
-<h1 mat-dialog-title>
+<!-- <h1 mat-dialog-title>
   Editar Nota Fiscal 
   <span *ngIf="notaCarregada">#{{notaCarregada.numeroSequencial}}</span>
+</h1> -->
+
+<h1 mat-dialog-title>
+  {{ isReadOnly ? 'Visualizar Nota Fiscal #' : 'Editar Nota Fiscal #' }}{{ notaCarregada?.numeroSequencial }}
 </h1>
 
 <div *ngIf="isLoading" class="spinner-container">
@@ -9,19 +13,26 @@
 
 <div mat-dialog-content *ngIf="!isLoading">
 
-  <div class="form-novo-item">
+  <div class="form-novo-item" *ngIf="!isReadOnly">
     <mat-form-field appearance="fill">
       <mat-label>Selecione um Produto</mat-label>
-      <mat-select [(ngModel)]="novoItem.codigoProduto" name="codigoProduto">
+      <mat-select [(ngModel)]="novoItem.codigoProduto" name="codigoProduto" required #produtoSelectModal="ngModel">
         <mat-option *ngFor="let produto of data.listaProdutos" [value]="produto.codigo">
           {{produto.codigo}} - {{produto.descricao}}
         </mat-option>
       </mat-select>
+      <mat-error *ngIf="produtoSelectModal.invalid && produtoSelectModal.touched">
+        É obrigatório selecionar um produto.
+      </mat-error>
     </mat-form-field>
 
     <mat-form-field appearance="fill" class="input-quantidade">
       <mat-label>Qtd.</mat-label>
-      <input matInput type="number" [(ngModel)]="novoItem.quantidade" name="quantidade" min="1">
+      <input matInput type="number" [(ngModel)]="novoItem.quantidade" name="quantidade" required min="1" #qtdModal="ngModel">
+      <mat-error *ngIf="qtdModal.invalid && qtdModal.touched">
+        <span *ngIf="qtdModal.errors?.['required']">obrigatório</span>
+        <span *ngIf="qtdModal.errors?.['min']">Min 1.</span>
+      </mat-error>
     </mat-form-field>
 
     <button mat-mini-fab color="primary" (click)="adicionarItem()" 
@@ -35,10 +46,12 @@
       Adicione itens à nota...
     </div>
     <div *ngFor="let item of itensParaSalvar; let i = index" class="item-nota">
-      <span>{{item.quantidade}}x {{item.codigoProduto}}</span>
-      <button mat-icon-button color="warn" (click)="removerItem(i)">
+      <span>{{item.quantidade}}x {{item.codigoProduto}} - {{ getDescricaoProduto(item.codigoProduto) }}</span>
+
+      <button mat-icon-button (click)="removerItem(i)" aria-label="Remover item" *ngIf="!isReadOnly">
         <mat-icon>delete_outline</mat-icon>
       </button>
+
     </div>
   </div>
 
@@ -46,13 +59,11 @@
 
 <div mat-dialog-actions align="end">
   <div class="salvar-wrapper">
-    <button mat-raised-button color="primary" 
-            (click)="salvarEdicao()" 
-            [disabled]="isLoading || isSaving || itensParaSalvar.length === 0">
-      Salvar
-    </button>
+  <button mat-raised-button class="btn-success" (click)="salvarEdicao()" [disabled]="isSaving" *ngIf="!isReadOnly">
+    {{ isSaving ? 'Salvando...' : 'Salvar Alterações' }}
+  </button>
     <mat-spinner *ngIf="isSaving" [diameter]="24"></mat-spinner>
   </div>
 
-  <button mat-button (click)="fecharModal()" [disabled]="isSaving">Cancelar</button>
+  <button mat-button (click)="fecharModal()"> {{ isReadOnly ? 'Fechar' : 'Cancelar' }}</button>
 </div>

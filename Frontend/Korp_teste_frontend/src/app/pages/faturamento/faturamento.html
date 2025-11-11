@@ -8,16 +8,23 @@
 
       <mat-form-field appearance="fill">
         <mat-label>Selecione um Produto</mat-label>
-        <mat-select [(ngModel)]="novoItem.codigoProduto" name="codigoProduto">
+        <mat-select [(ngModel)]="novoItem.codigoProduto" name="codigoProduto" required #produtoSelect="ngModel">
           <mat-option *ngFor="let produto of listaProdutos" [value]="produto.codigo">
             {{produto.codigo}} - {{produto.descricao}}
           </mat-option>
         </mat-select>
+        <mat-error *ngIf="produtoSelect.invalid && produtoSelect.touched">
+          É obrigatório selecionar um produto.
+        </mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="fill" class="input-quantidade">
         <mat-label>Qtd.</mat-label>
-        <input matInput type="number" [(ngModel)]="novoItem.quantidade" name="quantidade" min="1">
+        <input matInput type="number" [(ngModel)]="novoItem.quantidade" name="quantidade" required min="1" #qtd="ngModel">
+        <mat-error *ngIf="qtd.invalid && qtd.touched">
+          <span *ngIf="qtd.errors?.['required']">obrigatório</span>
+          <span *ngIf="qtd.errors?.['min']">Min 1.</span>
+        </mat-error>
       </mat-form-field>
 
       <button mat-mini-fab color="primary" (click)="adicionarItem()" 
@@ -32,7 +39,7 @@
         Adicione itens à nota...
       </div>
       <div *ngFor="let item of itensDaNovaNota; let i = index" class="item-nota">
-        <span>{{item.quantidade}}x {{item.codigoProduto}}</span>
+        <span>{{item.quantidade}}x {{item.codigoProduto}} - {{ getDescricaoProduto(item.codigoProduto) }}</span>
         <button mat-icon-button color="warn" (click)="removerItem(i)" aria-label="Remover item">
           <mat-icon>delete_outline</mat-icon>
         </button>
@@ -48,37 +55,42 @@
     </mat-card-actions>
   </mat-card>
 
-  <mat-card class="table-card">
-    <mat-card-header>
-      <mat-card-title>Notas Fiscais Emitidas</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      
-      <table mat-table [dataSource]="notasFiscais" class="mat-elevation-z8">
+    <mat-card class="table-card">
+      <mat-card-header>
+        <mat-card-title>Notas Fiscais Emitidas</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        
+      <mat-form-field appearance="fill" class="campo-pesquisa">
+        <mat-label>Pesquisar Notas...</mat-label>
+          <input matInput (keyup)="aplicarFiltro($event)" placeholder="Ex: Aberta" #input>
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>        
 
-        <ng-container matColumnDef="numeroSequencial">
-          <th mat-header-cell *matHeaderCellDef> N° Nota </th>
-          <td mat-cell *matCellDef="let nf"> {{nf.numeroSequencial}} </td>
-        </ng-container>
+        <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8" *ngIf="dataSource.data.length > 0">
 
-        <ng-container matColumnDef="status">
-          <th mat-header-cell *matHeaderCellDef> Status </th>
-          <td mat-cell *matCellDef="let nf" [ngClass]="nf.status === 'Aberta' ? 'status-aberta' : 'status-fechada'">
-            {{nf.status}}
-          </td>
-        </ng-container>
+          <ng-container matColumnDef="numeroSequencial">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> N° Nota </th>
+            <td mat-cell *matCellDef="let nf"> {{nf.numeroSequencial}} </td>
+          </ng-container>
 
-        <ng-container matColumnDef="itens">
-          <th mat-header-cell *matHeaderCellDef> Itens </th>
-          <td mat-cell *matCellDef="let nf"> 
-            {{ nf.itens.length }} item(ns)
-          </td>
-        </ng-container>
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Status </th>
+            <td mat-cell *matCellDef="let nf" [ngClass]="nf.status === 'Aberta' ? 'status-aberta' : 'status-fechada'">
+              {{nf.status}}
+            </td>
+          </ng-container>
 
-        <ng-container matColumnDef="acoes">
-          <th mat-header-cell *matHeaderCellDef> Ações </th>
-          <td mat-cell *matCellDef="let nf"> 
-              
+          <ng-container matColumnDef="itens">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Itens </th>
+            <td mat-cell *matCellDef="let nf"> 
+              {{ nf.itens.length }} item(ns)
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="acoes">
+            <th mat-header-cell *matHeaderCellDef> Ações </th>
+            <td mat-cell *matCellDef="let nf"> 
               <div class="coluna-acoes"> 
               
                 <button mat-icon-button color="primary" 
@@ -102,14 +114,30 @@
                   <mat-icon>delete</mat-icon>
                 </button>
                 <mat-spinner *ngIf="imprimindoId === nf.id" [diameter]="24"></mat-spinner>
-                
-              </div> </td>
+
+                <button mat-icon-button 
+                        (click)="abrirModalVisualizacao(nf)" 
+                        *ngIf="nf.status === 'Fechada'"
+                        aria-label="Visualizar Nota Fiscal">
+                  <mat-icon>visibility</mat-icon> 
+                </button>
+
+              </div> 
+            </td>
           </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-      </table>
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
 
-    </mat-card-content>
-  </mat-card>
-</div>
+        <mat-paginator [pageSizeOptions]="[5, 10, 20]" 
+                      showFirstLastButtons 
+                      aria-label="Selecionar página de notas fiscais">
+        </mat-paginator>
+
+        <div *ngIf="dataSource.data.length === 0" class="empty-state">
+          Nenhuma nota fiscal encontrada. Comece criando uma no formulário acima.
+        </div>
+
+      </mat-card-content>
+    </mat-card></div>
