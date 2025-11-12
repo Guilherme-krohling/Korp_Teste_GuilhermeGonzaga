@@ -140,15 +140,19 @@ namespace Korp.Faturamento.Api.Controllers
                     if (!response.IsSuccessStatusCode)
                     {
                         // A API de Estoque falhou (ex: saldo insuficiente, produto não existe)
-                        var erroMsg = await response.Content.ReadAsStringAsync();
-                        _logger.LogError($"Falha ao abater saldo do produto {item.CodigoProduto}: {erroMsg}");
+                        //var erroMsg = await response.Content.ReadAsStringAsync();
+                        var erroApiEstoque = await response.Content.ReadFromJsonAsync<object>();
 
+                        //_logger.LogError($"Falha ao abater saldo do produto {item.CodigoProduto}: {erroMsg}");
+                        _logger.LogError($"Falha ao abater saldo. API de Estoque respondeu: {erroApiEstoque}");
+
+                        return StatusCode((int)response.StatusCode, erroApiEstoque);
                         // Para a operação e avisa o usuário
-                        return BadRequest(new
-                        {
-                            message = $"Falha ao processar item {item.CodigoProduto}. Operação cancelada.",
-                            erroApiEstoque = erroMsg
-                        });
+                        //return BadRequest(new
+                        //{
+                        //    message = $"Falha ao processar item {item.CodigoProduto}. Operação cancelada.",
+                        //    erroApiEstoque = erroMsg
+                        //});
                     }
                 }
 

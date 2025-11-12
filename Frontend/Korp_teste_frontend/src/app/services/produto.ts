@@ -41,4 +41,9 @@ export class ProdutoService {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
+  sugerirDescricao(prompt: string): Observable<any> {
+    const iaApiUrl = 'http://localhost:5191/api/produtos/sugerir-descricao';
+    return this.http.post<any>(iaApiUrl, { prompt: prompt });
+  }
+
 }

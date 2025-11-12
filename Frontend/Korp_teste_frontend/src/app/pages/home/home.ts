@@ -1,20 +1,16 @@
-// 1. IMPORTAR ViewChild
 import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-// 2. IMPORTAR MatTableDataSource
 import { MatTableModule, MatTableDataSource } from '@angular/material/table'; 
 import { MatFormFieldModule } from '@angular/material/form-field';
-// 3. IMPORTAR MatCardHeader (corrigido)
 import { MatCardModule, MatCardHeader } from '@angular/material/card';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon'; 
-// 4. IMPORTAR MatSort e MatSortModule
 import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
-
 import { ProdutoService, Produto } from '../../services/produto';
 import { HttpErrorResponse } from '@angular/common/http';
 import { catchError, throwError } from 'rxjs';
@@ -32,10 +28,11 @@ import { catchError, throwError } from 'rxjs';
     MatTableModule,
     MatFormFieldModule,
     MatCardModule,
-    MatCardHeader, // <-- Corrigido
+    MatCardHeader,
     MatIconModule,
-    MatSortModule,  // <-- Adicionado
-    MatPaginatorModule
+    MatSortModule,
+    MatPaginatorModule,
+    MatProgressSpinnerModule
   ]
 })
 export class Home implements OnInit {
@@ -44,15 +41,13 @@ export class Home implements OnInit {
   private snackBar = inject(MatSnackBar);
 
   @ViewChild('produtoForm') produtoForm!: NgForm;
-  
-  // 5. ADICIONAR ViewChild para o MatSort
   @ViewChild(MatSort) sort!: MatSort;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   produtoSelecionado: Produto | null = null; 
   tituloFormulario: string = 'Cadastrar Novo Produto';
-  
-  // 6. MUDAR de 'produtos' para 'dataSource'
+  sugerindoDescricao = false;
+
   dataSource = new MatTableDataSource<Produto>();
   displayedColumns: string[] = ['codigo', 'descricao', 'saldo', 'acoes']; 
 
@@ -117,6 +112,33 @@ export class Home implements OnInit {
     this.tituloFormulario = 'Cadastrar Novo Produto';
     this.limparFormulario();
   }
+
+  sugerirDescricao(): void {
+    // Pega o que o usuário digitou (ex: "Mouse Gamer")
+    const prompt = this.formProduto.descricao;
+
+    if (!prompt) {
+      this.mostrarNotificacao('Digite um nome de produto primeiro (ex: "Mouse Gamer").', true);
+      return;
+    }
+
+    this.sugerindoDescricao = true; // Ativa o spinner
+
+    this.produtoService.sugerirDescricao(prompt).subscribe({
+      next: (response) => {
+        
+        // Atualiza o formulário com o texto da IA
+        // Remove aspas que a IA às vezes inclui
+        this.formProduto.descricao = response.descricaoSugerida.replace(/\"/g, '');
+        this.sugerindoDescricao = false; 
+      },
+      error: (err) => {
+        this.mostrarNotificacao('Erro ao contatar a IA. Verifique a chave de API.', true);
+        this.sugerindoDescricao = false;
+      }
+    });
+  }
+
   excluirProduto(produto: Produto): void {
     if (confirm(`Tem certeza que deseja excluir o produto "${produto.descricao}"?`)) {
       this.produtoService.deleteProduto(produto.id!)

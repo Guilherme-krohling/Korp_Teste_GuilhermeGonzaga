@@ -52,3 +52,14 @@ table {
   border: 2px dashed #eee;
   border-radius: 8px;
 }
+
+.campo-com-botao {
+  display: flex;
+  align-items: center; /* Alinha o campo e o botão */
+  gap: 8px;
+}
+
+/* Faz o campo de formulário ocupar o espaço */
+.campo-com-botao mat-form-field {
+  flex: 1; /* Ocupa todo o espaço livre */
+}

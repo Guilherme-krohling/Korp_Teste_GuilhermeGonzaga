@@ -15,13 +15,30 @@
           </mat-error>
         </mat-form-field>
 
-        <mat-form-field appearance="fill">
+        <!-- <mat-form-field appearance="fill">
           <mat-label>Descrição (Nome)</mat-label>
           <input matInput [(ngModel)]="formProduto.descricao" name="descricao" required #descricao="ngModel">
           <mat-error *ngIf="descricao.invalid && (descricao.dirty || descricao.touched)">
               O campo Descrição é obrigatório.
             </mat-error>        
-        </mat-form-field>
+        </mat-form-field> -->
+
+        <div class="campo-com-botao">
+
+          <mat-form-field appearance="fill">
+            <mat-label>Descrição (Nome)</mat-label>
+            <input matInput [(ngModel)]="formProduto.descricao" name="descricao" required #descricao="ngModel">
+            <mat-error *ngIf="descricao.invalid && (descricao.dirty || descricao.touched)">
+              O campo Descrição é obrigatório.
+            </mat-error>
+          </mat-form-field>
+          
+          <button mat-icon-button color="primary" type="button" (click)="sugerirDescricao()" [disabled]="sugerindoDescricao"
+            aria-label="Sugerir descrição com IA">
+            <mat-icon *ngIf="!sugerindoDescricao">auto_awesome</mat-icon> <mat-progress-spinner *ngIf="sugerindoDescricao"
+              [diameter]="24"></mat-progress-spinner>
+          </button>
+        </div>
 
         <mat-form-field appearance="fill">
           <mat-label>Saldo (Quantidade)</mat-label>

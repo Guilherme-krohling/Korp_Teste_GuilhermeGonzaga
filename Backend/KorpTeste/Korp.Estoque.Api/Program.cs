@@ -33,6 +33,8 @@ builder.Services.AddDbContext<EstoqueContext>(options =>
     options.UseSqlite(connectionString)
 );
 
+builder.Services.AddHttpClient();
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
