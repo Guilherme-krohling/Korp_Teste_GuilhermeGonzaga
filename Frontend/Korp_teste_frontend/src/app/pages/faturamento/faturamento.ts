@@ -1,28 +1,23 @@
-// 1. IMPORTAR ViewChild
-import { Component, OnInit, inject, ViewChild } from '@angular/core'; 
 import { CommonModule } from '@angular/common';
+import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MatSnackBar } from '@angular/material/snack-bar';
-// 2. IMPORTAR MatCardHeader (corrigido)
-import { MatCardModule, MatCardHeader} from '@angular/material/card'; 
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-// 3. IMPORTAR MatTableDataSource
-import { MatTableModule, MatTableDataSource } from '@angular/material/table'; 
+import { MatCardHeader, MatCardModule } from '@angular/material/card';
+import { MatDialog } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
-// 4. IMPORTAR MatSort e MatSortModule
-import { MatSort, MatSortModule } from '@angular/material/sort'; 
+import { MatInputModule } from '@angular/material/input';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
-import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { ModalEditNota } from './modal-edit-nota/modal-edit-nota';
 
-import { NotafiscalService, NotaFiscal, ItemNotaFiscalInput } from '../../services/notafiscal';
-import { Produto, ProdutoService } from '../../services/produto';
 import { HttpErrorResponse } from '@angular/common/http';
 import { catchError, throwError } from 'rxjs';
+import { ItemNotaFiscalInput, NotaFiscal, NotafiscalService } from '../../services/notafiscal';
+import { Produto, ProdutoService } from '../../services/produto';
 
 @Component({
   selector: 'app-faturamento',
@@ -39,7 +34,6 @@ import { catchError, throwError } from 'rxjs';
     MatIconModule,
     MatProgressSpinnerModule,
     MatSelectModule,
-    MatSortModule, // <-- Adicionado
     MatPaginatorModule
   ],
   templateUrl: './faturamento.html',
@@ -52,14 +46,10 @@ export class Faturamento implements OnInit {
   private produtoService = inject(ProdutoService);
   private dialog = inject(MatDialog);
   
-  // 5. ADICIONAR ViewChild para o MatSort
-  @ViewChild(MatSort) sort!: MatSort;
-
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   listaProdutos: Produto[] = [];
 
-  // 6. MUDAR de 'notasFiscais' para 'dataSource'
   dataSource = new MatTableDataSource<NotaFiscal>();
   displayedColumns: string[] = ['numeroSequencial', 'status', 'itens', 'acoes'];
 
@@ -82,10 +72,7 @@ export class Faturamento implements OnInit {
   }
   carregarNotasFiscais(): void {
     this.notafiscalService.getNotasFiscais().subscribe(data => {
-      // 7. POPULAR O dataSource
       this.dataSource.data = data;
-      // 8. CONECTAR O SORT (Esta é a "mágica" que faltava)
-      this.dataSource.sort = this.sort;
       this.dataSource.paginator = this.paginator;
     });
   }

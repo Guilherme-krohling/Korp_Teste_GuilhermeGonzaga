@@ -1,24 +1,23 @@
 import { ApplicationConfig, importProvidersFrom, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
 
-import { routes } from './app.routes';
 import { provideClientHydration } from '@angular/platform-browser';
+import { routes } from './app.routes';
 
-// Imports necessários
-import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideHttpClient, withFetch } from '@angular/common/http';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { provideAnimations } from '@angular/platform-browser/animations';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideZoneChangeDetection({ eventCoalescing: true }), // Para o Zone.js
+    provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideClientHydration(),
     
-    provideAnimations(), // Para o Material Animations
-    provideHttpClient(withFetch()), // Para o HttpClient
-    importProvidersFrom(MatSnackBarModule), // Para o MatSnackBar
+    provideAnimations(),
+    provideHttpClient(withFetch()),
+    importProvidersFrom(MatSnackBarModule),
     importProvidersFrom(MatDialogModule)
   ]
 };

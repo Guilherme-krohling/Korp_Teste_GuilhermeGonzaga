@@ -1,19 +1,18 @@
-import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, NgForm } from '@angular/forms';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatTableModule, MatTableDataSource } from '@angular/material/table'; 
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatCardModule, MatCardHeader } from '@angular/material/card';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { MatIconModule } from '@angular/material/icon'; 
-import { MatSort, MatSortModule } from '@angular/material/sort';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
-import { ProdutoService, Produto } from '../../services/produto';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
+import { FormsModule, NgForm } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardHeader, MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { catchError, throwError } from 'rxjs';
+import { Produto, ProdutoService } from '../../services/produto';
 
 @Component({
   selector: 'app-home',
@@ -30,7 +29,6 @@ import { catchError, throwError } from 'rxjs';
     MatCardModule,
     MatCardHeader,
     MatIconModule,
-    MatSortModule,
     MatPaginatorModule,
     MatProgressSpinnerModule
   ]
@@ -41,7 +39,6 @@ export class Home implements OnInit {
   private snackBar = inject(MatSnackBar);
 
   @ViewChild('produtoForm') produtoForm!: NgForm;
-  @ViewChild(MatSort) sort!: MatSort;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   produtoSelecionado: Produto | null = null; 
@@ -63,7 +60,6 @@ export class Home implements OnInit {
   }
   aplicarFiltro(event: Event) {
       const filterValue = (event.target as HTMLInputElement).value;
-      // O filter já busca em todos os campos do objeto
       this.dataSource.filter = filterValue.trim().toLowerCase(); 
 
       if (this.dataSource.paginator) {
@@ -72,16 +68,11 @@ export class Home implements OnInit {
   }
   carregarProdutos(): void {
     this.produtoService.getProdutos().subscribe(data => {
-      // 7. POPULAR O dataSource
       this.dataSource.data = data;
-      // 8. CONECTAR O SORT (Esta é a "mágica" que faltava)
-      this.dataSource.sort = this.sort;
       this.dataSource.paginator = this.paginator;
     });
   }
 
-  // ... (O resto do seu código, salvarProduto, excluirProduto, etc., continua aqui)
-  // ...
   salvarProduto(): void {
      if (this.produtoSelecionado) {
       this.produtoService.updateProduto(this.formProduto)
@@ -114,7 +105,6 @@ export class Home implements OnInit {
   }
 
   sugerirDescricao(): void {
-    // Pega o que o usuário digitou (ex: "Mouse Gamer")
     const prompt = this.formProduto.descricao;
 
     if (!prompt) {
@@ -122,13 +112,11 @@ export class Home implements OnInit {
       return;
     }
 
-    this.sugerindoDescricao = true; // Ativa o spinner
+    this.sugerindoDescricao = true;
 
     this.produtoService.sugerirDescricao(prompt).subscribe({
       next: (response) => {
         
-        // Atualiza o formulário com o texto da IA
-        // Remove aspas que a IA às vezes inclui
         this.formProduto.descricao = response.descricaoSugerida.replace(/\"/g, '');
         this.sugerindoDescricao = false; 
       },

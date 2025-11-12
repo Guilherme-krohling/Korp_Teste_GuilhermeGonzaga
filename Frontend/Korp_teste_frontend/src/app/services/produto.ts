@@ -1,8 +1,7 @@
-import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs'; // Importação principal do RxJS
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 
-// Criamos uma interface para o nosso modelo 'Produto'
 export interface Produto {
   id?: number;
   codigo: string;
@@ -19,25 +18,19 @@ export class ProdutoService {
 
   constructor(private http: HttpClient) { }
 
-  // GET: Retorna um Observable com a lista de produtos
   getProdutos(): Observable<Produto[]> {
     return this.http.get<Produto[]>(this.apiUrl);
   }
 
-  // POST: Retorna um Observable com o produto criado
   addProduto(produto: Produto): Observable<Produto> {
     return this.http.post<Produto>(this.apiUrl, produto);
   }
 
-  // PUT: Atualiza um produto existente
   updateProduto(produto: Produto): Observable<void> {
-    // Note a URL: .../api/produtos/5 (usando o ID do produto)
     return this.http.put<void>(`${this.apiUrl}/${produto.id}`, produto);
   }
 
-  // DELETE: Exclui um produto
   deleteProduto(id: number): Observable<void> {
-    // Note a URL: .../api/produtos/5
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 

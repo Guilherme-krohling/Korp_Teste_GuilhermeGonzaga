@@ -8,9 +8,6 @@ namespace Korp.Estoque.Api.Data
         public EstoqueContext(DbContextOptions<EstoqueContext> options) : base(options)
         {
         }
-
-        // Informa ao Entity Framework que existe uma tabela "Produtos"
-        // que será baseada no modelo "Produto"
         public DbSet<Produto> Produtos { get; set; }
     }
 }

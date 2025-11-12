@@ -4,7 +4,6 @@ namespace Korp.Estoque.Api.Models
 {
     public class Produto
     {
-        // Chave primária para o banco de dados
         public int Id { get; set; }
 
         [Required(ErrorMessage = "O campo Código é obrigatório")]

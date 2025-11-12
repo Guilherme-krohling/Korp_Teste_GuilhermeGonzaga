@@ -1,4 +1,3 @@
-/* Copiado de 'faturamento.css' */
 .form-novo-item {
   display: flex;
   align-items: center;
@@ -33,7 +32,6 @@
   border-bottom: 1px solid #eee;
 }
 
-/* Específico do Modal */
 .spinner-container {
   display: flex;
   justify-content: center;

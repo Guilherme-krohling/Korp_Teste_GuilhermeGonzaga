@@ -9,13 +9,11 @@ namespace Korp.Faturamento.Api.Data
         {
         }
 
-        // Informa ao EF Core sobre nossas duas novas tabelas
         public DbSet<NotaFiscal> NotasFiscais { get; set; }
         public DbSet<ItemNotaFiscal> ItensNotaFiscal { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Configura o relacionamento: Uma NotaFiscal tem Muitos Itens
             modelBuilder.Entity<NotaFiscal>()
                 .HasMany(n => n.Itens)
                 .WithOne(i => i.NotaFiscal)

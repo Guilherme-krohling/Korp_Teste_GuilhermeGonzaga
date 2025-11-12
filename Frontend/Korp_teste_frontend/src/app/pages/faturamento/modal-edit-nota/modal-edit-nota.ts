@@ -1,21 +1,16 @@
-import { Component, OnInit, inject, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-
-// Imports do Material para o Modal
+import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-
-// Nossos serviços e interfaces
-// 🚨 CORREÇÃO AQUI: O caminho não deve ter '.service' no final
-import { NotafiscalService, NotaFiscal, ItemNotaFiscalInput } from '../../../services/notafiscal';
+import { MatSelectModule } from '@angular/material/select';
+import { ItemNotaFiscalInput, NotaFiscal, NotafiscalService } from '../../../services/notafiscal';
 import { Produto } from '../../../services/produto';
 
 @Component({
@@ -37,34 +32,27 @@ import { Produto } from '../../../services/produto';
 })
 export class ModalEditNota implements OnInit {
   
-  // Injeção de dependências
   private notafiscalService = inject(NotafiscalService);
   private snackBar = inject(MatSnackBar);
-
-  // Referência ao Modal (para fechar)
   public dialogRef = inject(MatDialogRef<ModalEditNota>);
   
-  // Recebendo os dados (ID da nota e lista de produtos) da página principal
   public data: { 
     notaId: number, 
     listaProdutos: Produto[], 
-    isReadOnly?: boolean // <-- ADICIONE ESTA LINHA
+    isReadOnly?: boolean
   } = inject(MAT_DIALOG_DATA);
 
-  // Variáveis locais
   public notaCarregada: NotaFiscal | null = null;
   public itensParaSalvar: ItemNotaFiscalInput[] = [];
   public novoItem: ItemNotaFiscalInput = { codigoProduto: '', quantidade: 1 };
-  public isLoading = true; // Controla o spinner de "carregando nota"
-  public isSaving = false; // Controla o spinner de "salvando"
+  public isLoading = true;
+  public isSaving = false;
   public isReadOnly = false;
 
   ngOnInit(): void {
     this.isReadOnly = this.data.isReadOnly ?? false;
-    // Busca os dados da nota fiscal assim que o modal abre
     this.notafiscalService.getNotaFiscalPorId(this.data.notaId).subscribe(nota => {
       this.notaCarregada = nota;
-      // Copia os itens da nota para o nosso array de edição
       this.itensParaSalvar = nota.itens.map(item => ({
         codigoProduto: item.codigoProduto,
         quantidade: item.quantidade
@@ -73,14 +61,11 @@ export class ModalEditNota implements OnInit {
     });
   }
   getDescricaoProduto(codigo: string): string {
-      // 1. Procura o produto na lista que recebemos da página principal
       const produto = this.data.listaProdutos.find(p => p.codigo === codigo);
-      
-      // 2. Se encontrar, retorna a descrição. Se não, retorna um texto padrão.
+    
       return produto ? produto.descricao : 'Produto não encontrado';
   }
   
-  // --- Funções do Formulário ---
   adicionarItem(): void {
     if (this.novoItem.codigoProduto && this.novoItem.quantidade > 0) {
       this.itensParaSalvar.push({ ...this.novoItem });
@@ -104,7 +89,6 @@ export class ModalEditNota implements OnInit {
     this.notafiscalService.updateNotaFiscal(this.data.notaId, notaInput).subscribe({
       next: () => {
         this.isSaving = false;
-        // Fecha o modal e envia 'true' (sucesso) de volta para a página
         this.dialogRef.close(true);
       },
       error: (err) => {
@@ -115,7 +99,6 @@ export class ModalEditNota implements OnInit {
   }
 
   fecharModal(): void {
-    // Fecha o modal sem enviar resposta (cancelar)
     this.dialogRef.close();
   }
 }

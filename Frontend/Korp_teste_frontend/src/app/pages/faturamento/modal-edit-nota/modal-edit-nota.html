@@ -1,8 +1,3 @@
-<!-- <h1 mat-dialog-title>
-  Editar Nota Fiscal 
-  <span *ngIf="notaCarregada">#{{notaCarregada.numeroSequencial}}</span>
-</h1> -->
-
 <h1 mat-dialog-title>
   {{ isReadOnly ? 'Visualizar Nota Fiscal #' : 'Editar Nota Fiscal #' }}{{ notaCarregada?.numeroSequencial }}
 </h1>

@@ -4,10 +4,8 @@
 
 namespace Korp.Faturamento.Api.Migrations
 {
-    /// <inheritdoc />
     public partial class InitialFaturamento : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
@@ -51,7 +49,6 @@ namespace Korp.Faturamento.Api.Migrations
                 column: "NotaFiscalId");
         }
 
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
