@@ -47,9 +47,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors(MyAllowSpecificOrigins);
 
-// 3. REMOVER O REDIRECIONAMENTO PROBLEMÁTICO
-// app.UseHttpsRedirection(); 
-
 app.UseAuthorization();
 app.MapControllers();
 
