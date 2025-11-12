@@ -4,9 +4,6 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ===================================
-// 1. DEFINIR A POLÍTICA DE CORS
-// ===================================
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
 builder.Services.AddCors(options =>
@@ -14,12 +11,14 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: MyAllowSpecificOrigins,
                       policy =>
                       {
-                          policy.WithOrigins("http://localhost:4200")
+                          policy.WithOrigins(
+                                    "http://localhost:4200",
+                                    "http://localhost:5191",
+                                    "https://localhost:7080")
                                 .AllowAnyHeader()
                                 .AllowAnyMethod();
                       });
 });
-
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
@@ -47,6 +46,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors(MyAllowSpecificOrigins);
+
+// 3. REMOVER O REDIRECIONAMENTO PROBLEMÁTICO
+// app.UseHttpsRedirection(); 
+
 app.UseAuthorization();
 app.MapControllers();
 

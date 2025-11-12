@@ -14,7 +14,7 @@ export interface Produto {
 })
 export class ProdutoService {
   
-  private apiUrl = 'https://localhost:7080/api/produtos'; 
+  private apiUrl = '/api/produtos';
 
   constructor(private http: HttpClient) { }
 
@@ -35,7 +35,7 @@ export class ProdutoService {
   }
 
   sugerirDescricao(prompt: string): Observable<any> {
-    const iaApiUrl = 'http://localhost:5191/api/produtos/sugerir-descricao';
+    const iaApiUrl = '/api/produtos/sugerir-descricao';
     return this.http.post<any>(iaApiUrl, { prompt: prompt });
   }
 

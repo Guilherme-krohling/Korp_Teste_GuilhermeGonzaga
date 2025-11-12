@@ -1,5 +1,6 @@
 using Korp.Estoque.Api.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,7 +17,9 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: MyAllowSpecificOrigins,
                       policy =>
                       {
-                          policy.WithOrigins("http://localhost:4200")
+                          policy.WithOrigins("http://localhost:4200",
+                                             "http://localhost:5191",
+                                             "http://localhost:5289")
                                 .AllowAnyHeader()
                                 .AllowAnyMethod();
                       });
@@ -29,8 +32,11 @@ builder.Services.AddDbContext<EstoqueContext>(options =>
     options.UseSqlite(connectionString)
 );
 
-builder.Services.AddHttpClient();
+var spaPath = "../../../Frontend/Korp_teste_frontend/dist/korp_teste_frontend/browser";
 
+builder.Services.AddSpaStaticFiles(configuration =>{configuration.RootPath = spaPath;});
+
+builder.Services.AddHttpClient();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -50,9 +56,17 @@ if (app.Environment.IsDevelopment())
 // (A ordem é importante: Tem que vir ANTES de UseAuthorization)
 // ==========================================================
 app.UseCors(MyAllowSpecificOrigins);
-
+app.UseStaticFiles();
+app.UseSpaStaticFiles();
 app.UseAuthorization();
 app.MapControllers();
+
+app.MapFallbackToFile("index.html", new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(builder.Environment.ContentRootPath, spaPath)
+    )
+});
 
 using (var scope = app.Services.CreateScope())
 {
